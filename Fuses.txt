@@ -1,0 +1,5 @@
+ATMega88:
+-U lfuse:w:0xff:m -U hfuse:w:0xdf:m -U efuse:w:0xf9:m 
+
+ATMega8:
+-U lfuse:w:0xff:m -U hfuse:w:0xc9:m
