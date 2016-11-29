@@ -15,7 +15,7 @@ MCU ?= atmega88
 F_OSC ?= 20000000
 UART_BAUD ?= 115200
 
-OBJS = main.o uart.o
+OBJS = main.o uart.o TWI_slave.o
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
