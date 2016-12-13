@@ -15,21 +15,16 @@
 
 #include "ppm.h"
 
-#define TIMEOUT 0xea5f /* 3ms at 20Mhz	=> 60000 ticks */
+#define MS_TO_TICKS(x) ((uint16_t)(((double)F_OSC/(double)1000)*(double)x))
 
-/* values needed for scaling:
+/* Graupner mx-16 timings */
+#define TIMEOUT   MS_TO_TICKS(3)
+#define TICKS_MIN MS_TO_TICKS(0.983)
+#define TICKS_MAX MS_TO_TICKS(2.025)
 
-				min trim:	|	mid trim:	|	max trim:
-	min stick pos.		19717			22097			24478		
-	max stick pos.		35717			38096			40476
-		
- */
-#define TICKS_MIN 22097UL
-#define TICKS_MAX 38096UL
-
-#define PPM_MIN 978
-#define PPM_MID 1490
-#define PPM_MAX 2017
+#define PPM_MIN 950
+#define PPM_MAX 2030
+#define PPM_MID (PPM_MIN + (PPM_MAX-PPM_MIN)/2)
 
 /* register names for AVR ATmega8 */
 #ifndef TIMSK1
