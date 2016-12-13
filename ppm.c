@@ -136,7 +136,7 @@ inline uint16_t scale(const uint16_t ticks)
 	if (ticks > TICKS_MAX)
 		return PPM_MAX;
 
-	return (((ticks - TICKS_MIN) * (PPM_MAX - PPM_MIN))
+	return (((uint32_t)(ticks - TICKS_MIN) * (PPM_MAX - PPM_MIN))
 		/ (TICKS_MAX - TICKS_MIN)) + PPM_MIN;
 }
 
