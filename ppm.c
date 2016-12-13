@@ -28,13 +28,28 @@
 #define TICKS_MAX 38096UL
 
 #define PPM_MIN 978
+#define PPM_MID 1490
 #define PPM_MAX 2017
 
 
 static uint16_t ppm_rc[CHANNELS];
-static uint16_t ppm_fallback[CHANNELS] = {
-	[ 0 ... CHANNELS-2 ] = PPM_MIN,
-	[       CHANNELS-1 ] = PPM_MAX,
+static uint16_t ppm_fallback[CHANNELS] = {	
+	PPM_MIN, /* channel1: throttle */
+	PPM_MID, /* channel2: pitch */
+	PPM_MID, /* channel3: roll */
+	PPM_MID, /* channel4: yaw */
+	PPM_MIN, /* channel5: */
+	PPM_MIN, /* channel6: */
+	PPM_MAX, /* channel7: emergency off */
+	PPM_MIN, /* channel8: */
+	PPM_MIN, /* channel9: */
+	PPM_MIN, /* channel10: */
+	PPM_MIN, /* channel11: */
+	PPM_MIN, /* channel12: */
+	PPM_MIN, /* channel13: */
+	PPM_MIN, /* channel14: */
+	PPM_MIN, /* channel15: */
+	PPM_MAX, /* channel16: reserved for failsafe */
 };
 
 volatile uint16_t *ppm_data = ppm_fallback;
