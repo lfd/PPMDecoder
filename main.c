@@ -11,27 +11,30 @@
  * the COPYING file in the top-level directory.
  */
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+#include <util/delay.h>
+#include <stdio.h>
+
+#include "ppm.h"
+#include "TWI_slave.h"
+
+#define I2C_DEVICE_ADDRESS 0x70
+
 int main(void) {
-	char buffer[128];
-	int i;
+	unsigned char i2c_device_address = I2C_DEVICE_ADDRESS;
 
 	cli();
 
-	uart_init();
-	uart_puts("Hello, world!\r\n");
-
 	ppm_init();
+	TWI_Slave_Initialise( (unsigned char) ((i2c_device_address << TWI_ADR_BITS) | (1 << TWI_GEN_BIT)) );
+
 	sei();
 
+	TWI_Start_Transceiver();
+
 	for(;;) {
-
-		/* dummy code */
-		for (i=0;i<CHANNELS;i++) {
-			sprintf(buffer, "%u ", *(ppm_data+i));
-			uart_puts(buffer);
-		}
-		uart_puts("\n\r");
-
-		_delay_ms(100);
-   	}
+		while (TWI_Transceiver_Busy());
+		TWI_Start_Transceiver_With_Data((unsigned char*)ppm_data, 32);
+	}
 }
