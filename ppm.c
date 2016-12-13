@@ -31,6 +31,11 @@
 #define PPM_MID 1490
 #define PPM_MAX 2017
 
+/* register names for AVR ATmega8 */
+#ifndef TIMSK1
+#define TIMSK1 TIMSK
+#define ICIE1 TICIE1
+#endif
 
 static uint16_t ppm_rc[CHANNELS];
 static uint16_t ppm_fallback[CHANNELS] = {	
