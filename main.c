@@ -13,6 +13,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/wdt.h>
 #include <util/delay.h>
 #include <stdio.h>
 
@@ -33,8 +34,12 @@ int main(void) {
 
 	TWI_Start_Transceiver();
 
+	wdt_enable(WDTO_30MS);
+
 	for(;;) {
-		while (TWI_Transceiver_Busy());
+		while (TWI_Transceiver_Busy())
+			wdt_reset();
 		TWI_Start_Transceiver_With_Data((unsigned char*)ppm_data, 32);
+		wdt_reset();
 	}
 }
