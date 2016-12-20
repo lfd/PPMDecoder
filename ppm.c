@@ -5,6 +5,7 @@
  *
  * Authors:
  *  Tobias Kottwitz <tobias.kottwitz@oth-regensburg.de>
+ *  Ralf Ramsauer <ralf.ramsauer@oth-regensburg.de>
  *
  * This work is licensed under the terms of the GNU GPL, version 2.  See
  * the COPYING file in the top-level directory.
@@ -12,6 +13,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <string.h>
 
 #include "ppm.h"
 
@@ -55,6 +57,7 @@ static uint16_t ppm_fallback[CHANNELS] = {
 volatile uint16_t *ppm_data = ppm_fallback;
 
 static int channel;
+static unsigned char max_channels = CHANNELS;
 
 /* variables to store ticks */
 uint16_t ticks;
@@ -99,27 +102,38 @@ ISR(TIMER1_CAPT_vect)
 	channel++;
 
 	/* if more channels are detected than we actually have, we need to send fallback values */
-	if (CHANNELS > 40)
+	if (channel > 40) {
 		ppm_data = ppm_fallback;
-	else if (channel == CHANNELS-1)
+	} else if (channel == max_channels-1) {
 		ppm_data = ppm_rc;
+	}
 }
 
 /* Interrupt: timeout (indicates next ppm frame or lost connection) */
 ISR(TIMER1_COMPA_vect)
 {	
 	static unsigned int timeout_ctr = 0;
+	static unsigned char channels_last_frame = 0;
 
-	if (channel == -1)
-		timeout_ctr++;
-	else
-		timeout_ctr = 0;
+	if (channel == -1) {
+		/* if we get 10 or more timeouts consecutively,
+		 * we lost remote connection */
+		if (++timeout_ctr == 10) {
+			ppm_data = ppm_fallback;
+		}
+		return;
+	}
 
-	/* if we get 10 or more timeouts consecutively, we lost remote connection */
-	if (timeout_ctr == 10)
-		ppm_data = ppm_fallback;
+	if (channels_last_frame == channel && max_channels != channels_last_frame) {
+		max_channels = (channels_last_frame > CHANNELS) ?
+				CHANNELS : channels_last_frame;
+		memcpy(ppm_rc + max_channels, ppm_fallback + max_channels,
+		       (CHANNELS - max_channels) * sizeof(*ppm_data));
+	}
 
+	channels_last_frame = channel;
 	channel = -1;
+	timeout_ctr = 0;
 }
 
 /* apply scaling to ppm_data */
