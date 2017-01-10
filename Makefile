@@ -26,7 +26,7 @@ CFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 CFLAGS += -Wall -Wextra -Wstrict-prototypes
 CFLAGS += -DF_OSC=$(F_OSC) -DF_CPU=F_OSC -DUART_BAUD=$(UART_BAUD)UL -DMCU=$(MCU)
 
-all: $(TARGET).hex
+all: $(TARGET).hex read_ppm
 
 $(TARGET).elf: $(OBJS)
 	$(CC) $(CFLAGS) -o $(TARGET).elf $^
@@ -40,3 +40,7 @@ program: $(TARGET).hex
 clean:
 	rm -f $(OBJS)
 	rm -f $(TARGET).elf $(TARGET).hex
+	rm -f read_ppm
+
+read_ppm: read_ppm.c
+	gcc -o read_ppm $^
