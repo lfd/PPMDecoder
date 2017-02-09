@@ -35,7 +35,7 @@
 #endif
 
 static uint16_t ppm_rc[CHANNELS];
-static uint16_t ppm_fallback[CHANNELS] = {	
+static uint16_t ppm_fallback[CHANNELS] = {
 	PPM_MIN, /* channel1: throttle */
 	PPM_MID, /* channel2: pitch */
 	PPM_MID, /* channel3: roll */
@@ -66,7 +66,7 @@ uint16_t ticks_result;
 
 /* Initialise AVR ATmega88 timer 1*/
 void ppm_init(void)
-{	
+{
 	/* no prescaler */
 	TCCR1B  = (1 << CS10);
 	/* enable noise chanceler */
@@ -101,7 +101,8 @@ ISR(TIMER1_CAPT_vect)
 
 	channel++;
 
-	/* if more channels are detected than we actually have, we need to send fallback values */
+	/* if more channels are detected than we actually have, we need to send
+	 * fallback values */
 	if (channel > 40) {
 		ppm_data = ppm_fallback;
 	} else if (channel == max_channels-1) {
@@ -111,7 +112,7 @@ ISR(TIMER1_CAPT_vect)
 
 /* Interrupt: timeout (indicates next ppm frame or lost connection) */
 ISR(TIMER1_COMPA_vect)
-{	
+{
 	static unsigned int timeout_ctr = 0;
 	static unsigned char channels_last_frame = 0;
 
@@ -124,7 +125,8 @@ ISR(TIMER1_COMPA_vect)
 		return;
 	}
 
-	if (channels_last_frame == channel && max_channels != channels_last_frame) {
+	if (channels_last_frame == channel &&
+	    max_channels != channels_last_frame) {
 		max_channels = (channels_last_frame > CHANNELS) ?
 				CHANNELS : channels_last_frame;
 		memcpy(ppm_rc + max_channels, ppm_fallback + max_channels,
@@ -138,7 +140,7 @@ ISR(TIMER1_COMPA_vect)
 
 /* apply scaling to ppm_data */
 inline uint16_t scale(const uint16_t ticks)
-{	
+{
 	if (ticks < TICKS_MIN)
  		return PPM_MIN;
 
